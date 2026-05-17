@@ -1,92 +1,180 @@
-
 import streamlit as st
 import pandas as pd
 import numpy as np
 import joblib
-import os
 
-# Define the base path for loading the model and scaler
-BASE_PATH_APP = '/content/drive/MyDrive/Trabajo Final IA/Despliegue_burnout/'
+# =============================
+# CARGAR MODELO Y SCALER
+# =============================
 
-# Load the model and scaler
-try:
-    scaler = joblib.load(os.path.join(BASE_PATH_APP, 'scaler.pkl'))
-    model = joblib.load(os.path.join(BASE_PATH_APP, 'modelo_burnout.pkl'))
-except Exception as e:
-    st.error(f"Error loading model or scaler. Make sure the files are in the correct path: {e}")
-    st.stop()
+@st.cache_resource
+def load_model():
+    model = joblib.load('modelo_burnout.pkl')
+    scaler = joblib.load('scaler.pkl')
+    return model, scaler
 
-st.title("Burnout Score Prediction App")
-st.write("Enter the student's characteristics to predict the burnout score:")
+model, scaler = load_model()
 
-# Input features based on the provided list
-# Ensure the order of input widgets corresponds to the expected order of features
-# in the model after one-hot encoding.
+# =============================
+# CONFIGURACIÓN DE LA APP
+# =============================
+
+st.set_page_config(
+    page_title="Predicción de Burnout",
+    page_icon="🧠",
+    layout="centered"
+)
+
+st.title("🧠 Predicción de Burnout Estudiantil")
+st.write(
+    "Ingrese la información del estudiante para predecir el nivel de burnout."
+)
+
+# =============================
+# INPUTS DEL USUARIO
+# =============================
 
 col1, col2 = st.columns(2)
 
 with col1:
-    age = st.number_input("Age", min_value=18, max_value=65, value=20, help="Age of the student")
-    academic_year = st.number_input("Academic Year", min_value=1, max_value=7, value=3, help="Academic year (e.g., 1st, 2nd, 3rd)")
-    study_hours_per_day = st.number_input("Study Hours Per Day", min_value=0.0, max_value=16.0, value=4.0, step=0.5, help="Average hours spent studying per day")
-    sleep_hours = st.number_input("Sleep Hours", min_value=0.0, max_value=12.0, value=7.0, step=0.5, help="Average hours of sleep per night")
-    physical_activity = st.number_input("Physical Activity (hours/week)", min_value=0.0, max_value=20.0, value=3.0, step=0.5, help="Hours of physical activity per week")
-    
+    age = st.slider("Edad", 18, 35, 21)
+
+    academic_year = st.slider(
+        "Año Académico",
+        1,
+        5,
+        3
+    )
+
+    study_hours_per_day = st.slider(
+        "Horas de estudio por día",
+        0.0,
+        12.0,
+        5.0
+    )
+
+    sleep_hours = st.slider(
+        "Horas de sueño",
+        0.0,
+        12.0,
+        7.0
+    )
+
+    physical_activity = st.slider(
+        "Actividad física",
+        0.0,
+        10.0,
+        3.0
+    )
+
 with col2:
-    screen_time = st.number_input("Screen Time (hours/day)", min_value=0.0, max_value=18.0, value=6.0, step=0.5, help="Hours spent on screens per day (non-academic)")
-    internet_usage = st.number_input("Internet Usage (hours/day)", min_value=0.0, max_value=18.0, value=5.0, step=0.5, help="Hours of internet usage per day (non-academic)")
-    exam_pressure = st.slider("Exam Pressure (1-10)", min_value=1, max_value=10, value=5, help="Perceived pressure from exams")
-    family_expectation = st.slider("Family Expectation (1-10)", min_value=1, max_value=10, value=5, help="Perceived family expectations")
-    financial_stress = st.slider("Financial Stress (1-10)", min_value=1, max_value=10, value=5, help="Perceived financial stress")
-    gender_selection = st.selectbox("Gender", ['Male', 'Female', 'Other'], help="Select student's gender")
 
+    screen_time = st.slider(
+        "Tiempo en pantalla",
+        0.0,
+        14.0,
+        6.0
+    )
 
-# Prepare gender for one-hot encoding
-gender_Male = 1 if gender_selection == 'Male' else 0
-gender_Other = 1 if gender_selection == 'Other' else 0
+    internet_usage = st.slider(
+        "Uso de internet",
+        0.0,
+        14.0,
+        5.0
+    )
 
-# Create a DataFrame from inputs with EXACTLY the training column names and order
-input_data = pd.DataFrame([[
-    age,
-    academic_year,
-    study_hours_per_day,
-    sleep_hours,
-    physical_activity,
-    screen_time,
-    internet_usage,
-    exam_pressure,
-    family_expectation,
-    financial_stress,
-    gender_Male,
-    gender_Other
-]], 
-columns=[
-    'age',
-    'academic_year',
-    'study_hours_per_day',
-    'sleep_hours',
-    'physical_activity',
-    'screen_time',
-    'internet_usage',
-    'exam_pressure',
-    'family_expectation',
-    'financial_stress',
-    'gender_Male',
-    'gender_Other'
-])
+    exam_pressure = st.slider(
+        "Presión de exámenes",
+        0.0,
+        10.0,
+        5.0
+    )
 
-if st.button("Predict Burnout Score"):
-    # Scale the input data using the loaded scaler
-    scaled_input_data = scaler.transform(input_data)
+    family_expectation = st.slider(
+        "Expectativa familiar",
+        0.0,
+        10.0,
+        5.0
+    )
 
-    # Make prediction using the loaded model
-    prediction = model.predict(scaled_input_data)[0]
+    financial_stress = st.slider(
+        "Estrés financiero",
+        0.0,
+        10.0,
+        5.0
+    )
 
-    # Limit the result between 0 and 10
-    final_prediction = np.clip(prediction, 0, 10)
+    gender = st.selectbox(
+        "Género",
+        ["Female", "Male", "Other"]
+    )
 
-    st.success(f"Predicted Burnout Score: {final_prediction:.2f}")
-    st.balloons()
+# =============================
+# ONE HOT ENCODING MANUAL
+# =============================
 
-st.write("---")
-st.markdown("**Disclaimer:** This is a demo application. The accuracy of predictions depends on the training data and features used. Please ensure the input features and their order match your trained model's requirements.")
+gender_Male = 1 if gender == "Male" else 0
+gender_Other = 1 if gender == "Other" else 0
+
+# =============================
+# DATAFRAME DE ENTRADA
+# =============================
+
+input_data = pd.DataFrame({
+    'age': [age],
+    'academic_year': [academic_year],
+    'study_hours_per_day': [study_hours_per_day],
+    'sleep_hours': [sleep_hours],
+    'physical_activity': [physical_activity],
+    'screen_time': [screen_time],
+    'internet_usage': [internet_usage],
+    'exam_pressure': [exam_pressure],
+    'family_expectation': [family_expectation],
+    'financial_stress': [financial_stress],
+    'gender_Male': [gender_Male],
+    'gender_Other': [gender_Other]
+})
+
+# =============================
+# PREDICCIÓN
+# =============================
+
+if st.button("Predecir Burnout"):
+
+    try:
+
+        # Escalamiento
+        scaled_data = scaler.transform(input_data)
+
+        # Predicción
+        prediction = model.predict(scaled_data)[0]
+
+        # Limitar resultado
+        prediction = np.clip(prediction, 0, 10)
+
+        st.success(
+            f"Nivel de burnout predicho: {prediction:.2f}"
+        )
+
+        # Interpretación básica
+        if prediction < 3:
+            st.info("🟢 Nivel de burnout bajo")
+
+        elif prediction < 7:
+            st.warning("🟡 Nivel de burnout moderado")
+
+        else:
+            st.error("🔴 Nivel de burnout alto")
+
+    except Exception as e:
+        st.error(f"Error durante la predicción: {e}")
+
+# =============================
+# FOOTER
+# =============================
+
+st.markdown("---")
+
+st.write(
+    "Aplicación desarrollada para el proyecto final de Analítica de Datos con IA."
+)
