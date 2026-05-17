@@ -11,7 +11,7 @@ BASE_PATH_APP = '/content/drive/MyDrive/Trabajo Final IA/Despliegue_burnout/'
 # Load the model and scaler
 try:
     scaler = joblib.load(BASE_PATH_APP, 'scaler.pkl')
-    model = joblib.load(BASE_PATH_APP, 'modelo_burnout.pkl'))
+    model = joblib.load(BASE_PATH_APP, 'modelo_burnout.pkl')
 except Exception as e:
     st.error(f"Error loading model or scaler. Make sure the files are in the correct path: {e}")
     st.stop()
