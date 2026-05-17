@@ -10,25 +10,11 @@ import os
 
 # Load the model and scaler
 try:
-    # Verificación extra para ayudarte a debuguear si Drive no está montado
-    if not os.path.exists(BASE_PATH_APP):
-        st.error(f"🚨 La carpeta NO existe en esta sesión de Colab: {BASE_PATH_APP}")
-        st.info("Asegúrate de haber ejecutado `drive.mount('/content/drive')` en tu celda de Colab antes de lanzar Streamlit.")
-        st.stop()
-        
     scaler = joblib.load('scaler.pkl')
     model = joblib.load('modelo_burnout.pkl')
-    
 except Exception as e:
-    st.error(f"Error cargando el modelo o el scaler: {e}")
-    # Esto te mostrará en la app qué archivos encuentra dentro de esa carpeta
-    try:
-        archivos_encontrados = os.listdir(BASE_PATH_APP)
-        st.warning(f"Archivos reales encontrados en la carpeta: {archivos_encontrados}")
-    except:
-        pass
+    st.error(f"Error loading model or scaler: {e}")
     st.stop()
-
 st.title("Burnout Score Prediction App")
 st.write("Enter the student's characteristics to predict the burnout score:")
 
