@@ -6,7 +6,7 @@ import joblib
 import os
 
 # Define the base path for loading the model and scaler
-BASE_PATH_APP = '/content/drive/MyDrive/Trabajo Final IA/Despliegue_burnout/'
+BASE_PATH_APP = '/content/drive/MyDrive/Trabajo Final IA/Despliegue_burnout'
 
 # Load the model and scaler
 try:
