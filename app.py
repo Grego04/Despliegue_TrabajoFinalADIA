@@ -143,24 +143,28 @@ if st.button("Predecir Burnout"):
 
     try:
 
-        # Escalamiento
+        # Escalar datos
         scaled_data = scaler.transform(input_data)
 
-        # Predicción
+        # Predicción original (0 a 10)
         prediction = model.predict(scaled_data)[0]
 
-        # Limitar resultado
-        prediction = np.clip(prediction, 0, 10)
+        # Convertir escala de 0-10 a 0-1
+        prediction = prediction / 10
 
+        # Limitar valores entre 0 y 1
+        prediction = np.clip(prediction, 0, 1)
+
+        # Mostrar resultado
         st.success(
             f"Nivel de burnout predicho: {prediction:.2f}"
         )
 
-        # Interpretación básica
-        if prediction < 3:
+        # Clasificación final
+        if prediction <= 0.3:
             st.info("🟢 Nivel de burnout bajo")
 
-        elif prediction < 7:
+        elif prediction <= 0.7:
             st.warning("🟡 Nivel de burnout moderado")
 
         else:
