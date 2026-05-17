@@ -16,8 +16,8 @@ try:
         st.info("Asegúrate de haber ejecutado `drive.mount('/content/drive')` en tu celda de Colab antes de lanzar Streamlit.")
         st.stop()
         
-    scaler = joblib.load(os.path.join(BASE_PATH_APP, 'scaler.pkl'))
-    model = joblib.load(os.path.join(BASE_PATH_APP, 'modelo_burnout.pkl'))
+    scaler = joblib.load('scaler.pkl'))
+    model = joblib.load('modelo_burnout.pkl')
     
 except Exception as e:
     st.error(f"Error cargando el modelo o el scaler: {e}")
