@@ -5,7 +5,8 @@ import joblib
 import os
 
 # 1. CORRECCIÓN DE RUTA: Quitamos la barra final para evitar conflictos con os.path.join
-BASE_PATH_APP = '/content/drive/MyDrive/Trabajo Final IA/Despliegue_burnout'
+
+BASE_PATH_APP = '/content'
 
 # Load the model and scaler
 try:
