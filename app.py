@@ -1,28 +1,37 @@
-
 import streamlit as st
 import pandas as pd
 import numpy as np
 import joblib
 import os
 
-# Define the base path for loading the model and scaler
+# 1. CORRECCIÓN DE RUTA: Quitamos la barra final para evitar conflictos con os.path.join
 BASE_PATH_APP = '/content/drive/MyDrive/Trabajo Final IA/Despliegue_burnout'
 
 # Load the model and scaler
 try:
-    scaler = joblib.load(BASE_PATH_APP, 'scaler.pkl')
-    model = joblib.load(BASE_PATH_APP, 'modelo_burnout.pkl')
+    # Verificación extra para ayudarte a debuguear si Drive no está montado
+    if not os.path.exists(BASE_PATH_APP):
+        st.error(f"🚨 La carpeta NO existe en esta sesión de Colab: {BASE_PATH_APP}")
+        st.info("Asegúrate de haber ejecutado `drive.mount('/content/drive')` en tu celda de Colab antes de lanzar Streamlit.")
+        st.stop()
+        
+    scaler = joblib.load(os.path.join(BASE_PATH_APP, 'scaler.pkl'))
+    model = joblib.load(os.path.join(BASE_PATH_APP, 'modelo_burnout.pkl'))
+    
 except Exception as e:
-    st.error(f"Error loading model or scaler. Make sure the files are in the correct path: {e}")
+    st.error(f"Error cargando el modelo o el scaler: {e}")
+    # Esto te mostrará en la app qué archivos encuentra dentro de esa carpeta
+    try:
+        archivos_encontrados = os.listdir(BASE_PATH_APP)
+        st.warning(f"Archivos reales encontrados en la carpeta: {archivos_encontrados}")
+    except:
+        pass
     st.stop()
 
 st.title("Burnout Score Prediction App")
 st.write("Enter the student's characteristics to predict the burnout score:")
 
 # Input features based on the provided list
-# Ensure the order of input widgets corresponds to the expected order of features
-# in the model after one-hot encoding.
-
 col1, col2 = st.columns(2)
 
 with col1:
