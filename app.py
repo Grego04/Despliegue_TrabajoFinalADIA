@@ -138,7 +138,6 @@ input_data = pd.DataFrame({
 # =============================
 # PREDICCIÓN
 # =============================
-
 if st.button("Predecir Burnout"):
 
     try:
@@ -146,11 +145,8 @@ if st.button("Predecir Burnout"):
         # Escalar datos
         scaled_data = scaler.transform(input_data)
 
-        # Predicción original (0 a 10)
+        # Predicción
         prediction = model.predict(scaled_data)[0]
-
-        # Convertir escala de 0-10 a 0-1
-        prediction = prediction / 10
 
         # Limitar valores entre 0 y 1
         prediction = np.clip(prediction, 0, 1)
@@ -160,7 +156,7 @@ if st.button("Predecir Burnout"):
             f"Nivel de burnout predicho: {prediction:.2f}"
         )
 
-        # Clasificación final
+        # Clasificación
         if prediction <= 0.3:
             st.info("🟢 Nivel de burnout bajo")
 
@@ -172,7 +168,6 @@ if st.button("Predecir Burnout"):
 
     except Exception as e:
         st.error(f"Error durante la predicción: {e}")
-
 # =============================
 # FOOTER
 # =============================
